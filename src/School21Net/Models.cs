@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace School21Net;
 
 // Public models mirror the OpenAPI *V1DTO schemas. The wire is camelCase, matched by the Web naming policy.
@@ -139,10 +137,4 @@ internal sealed class CampusesEnvelope
 internal sealed class CoalitionsEnvelope
 {
     public List<Coalition>? Coalitions { get; set; }
-}
-
-internal sealed record TokenResponse
-{
-    [JsonPropertyName("access_token")] public string? AccessToken { get; init; }
-    [JsonPropertyName("expires_in")] public int ExpiresIn { get; init; }
 }

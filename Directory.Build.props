@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Aigiz Iskuzhin</Authors>
     <Product>School21Net</Product>
     <Copyright>Copyright © 2026 Aigiz Iskuzhin</Copyright>

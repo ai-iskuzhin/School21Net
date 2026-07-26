@@ -1,50 +1,48 @@
 using System.Net;
+using School21Net.Authentication;
 
 namespace School21Net.Tests;
 
 public sealed class ClientTests
 {
-    private static School21ClientOptions Options() => new()
-    {
-        BaseUrl = "https://example.test/api",
-        TokenEndpoint = "https://auth.example.test/token",
-        Username = "login",
-        Password = "secret"
-    };
-
-    private static School21Client CreateClient(StubHttpMessageHandler handler)
-        => new(new HttpClient(handler), Options());
+    private static School21Client CreateClient(StubHttpMessageHandler handler, string accessToken = "test-token")
+        => new(
+            new HttpClient(handler),
+            new School21ClientOptions { BaseUrl = "https://example.test/api" },
+            new StaticAccessTokenProvider(accessToken));
 
     [Fact]
-    public async Task GetParticipants_authenticates_then_sends_status_query()
+    public async Task GetParticipants_sends_bearer_and_status_query()
     {
         var handler = new StubHttpMessageHandler(_ =>
             (HttpStatusCode.OK, "{\"participants\":[\"a\",\"b\",\"c\"]}"));
-        var client = CreateClient(handler);
+        var client = CreateClient(handler, "abc123");
 
         var logins = await client.Projects.GetParticipantsAsync(73465, ParticipantProjectStatus.Accepted);
 
         Assert.Equal(["a", "b", "c"], logins);
 
-        // First request is the token exchange, second is the participants call.
-        Assert.Equal(HttpMethod.Post, handler.Requests[0].Method);
-        var apiCall = handler.Requests[1];
+        // No token exchange happens on the client — auth is external. The only call is the API request,
+        // carrying the bearer supplied by the token provider.
+        var apiCall = Assert.Single(handler.Requests);
+        Assert.Equal("Bearer", apiCall.Headers.Authorization!.Scheme);
+        Assert.Equal("abc123", apiCall.Headers.Authorization!.Parameter);
         Assert.Contains("/v1/projects/73465/participants", apiCall.RequestUri!.AbsolutePath);
         Assert.Contains("status=ACCEPTED", apiCall.RequestUri!.Query);
         Assert.Contains("limit=1000", apiCall.RequestUri!.Query);
     }
 
     [Fact]
-    public async Task Reuses_cached_token_across_calls()
+    public async Task Uses_provider_token_on_every_call()
     {
         var handler = new StubHttpMessageHandler(_ => (HttpStatusCode.OK, "{\"participants\":[]}"));
-        var client = CreateClient(handler);
+        var client = CreateClient(handler, "bearer-xyz");
 
         await client.Projects.GetParticipantsAsync(1);
         await client.Coalitions.GetParticipantsAsync(2);
 
-        Assert.Single(handler.Requests, r =>
-            r.Method == HttpMethod.Post && r.RequestUri!.AbsolutePath.Contains("token"));
+        Assert.Equal(2, handler.Requests.Count);
+        Assert.All(handler.Requests, r => Assert.Equal("bearer-xyz", r.Headers.Authorization!.Parameter));
     }
 
     [Fact]

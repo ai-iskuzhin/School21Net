@@ -1,53 +1,59 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using School21Net.Authentication;
 using School21Net.Resources;
 
 namespace School21Net;
 
 /// <summary>
 /// Typed client for the official School 21 public API (<c>platform.21-school.ru/services/21-school/api</c>).
-/// Authenticates with the ROPC password grant and caches/refreshes the bearer transparently. Endpoints are
-/// grouped into <see cref="Participants"/>, <see cref="Projects"/>, <see cref="Campuses"/> and
-/// <see cref="Coalitions"/>. Non-2xx responses throw <see cref="School21ApiException"/>.
+/// It is auth-agnostic: before every request it asks an <see cref="ISchool21AccessTokenProvider"/> for a
+/// bearer, so credentials, token caching and refresh live entirely on the integrator side (obtain tokens
+/// with <see cref="School21AuthClient"/>). Endpoints are grouped into <see cref="Participants"/>,
+/// <see cref="Projects"/>, <see cref="Campuses"/> and <see cref="Coalitions"/>. Non-2xx responses throw
+/// <see cref="School21ApiException"/>.
 /// </summary>
 /// <example>
 /// <code>
-/// var client = new School21Client(httpClient, new School21ClientOptions { Username = "login", Password = "***" });
+/// var auth = new School21AuthClient(httpClient);
+/// var token = await auth.AuthenticateAsync("login", "***", ct);
+/// var client = new School21Client(httpClient, new School21ClientOptions(), new StaticAccessTokenProvider(token.AccessToken));
 /// var finishers = await client.Projects.GetParticipantsAsync(73465, ParticipantProjectStatus.Accepted);
 /// </code>
 /// </example>
 public sealed class School21Client
 {
     internal static readonly JsonSerializerOptions Json = CreateJsonOptions();
-    private static readonly string UserAgent = BuildUserAgent();
+    internal static readonly string UserAgent = BuildUserAgent();
 
     private readonly HttpClient _http;
-    private readonly School21ClientOptions _options;
+    private readonly ISchool21AccessTokenProvider _accessTokenProvider;
     private readonly string _baseUrl;
-    private readonly SemaphoreSlim _tokenGate = new(1, 1);
 
-    private string? _accessToken;
-    private DateTimeOffset _accessTokenExpiresAt = DateTimeOffset.MinValue;
-
-    /// <summary>Create a client. Pass a pooled <paramref name="httpClient"/> (e.g. from <c>IHttpClientFactory</c>).</summary>
+    /// <summary>
+    /// Create a client. Pass a pooled <paramref name="httpClient"/> (e.g. from <c>IHttpClientFactory</c>) and an
+    /// <paramref name="accessTokenProvider"/> that yields a valid bearer (use
+    /// <see cref="StaticAccessTokenProvider"/>, <see cref="DelegateAccessTokenProvider"/>, or your own
+    /// refresh-aware implementation).
+    /// </summary>
     /// <exception cref="ArgumentNullException">If an argument is null.</exception>
-    /// <exception cref="School21ValidationException">If credentials are missing.</exception>
-    public School21Client(HttpClient httpClient, School21ClientOptions options)
+    /// <exception cref="School21ValidationException">If the base URL is missing.</exception>
+    public School21Client(
+        HttpClient httpClient,
+        School21ClientOptions options,
+        ISchool21AccessTokenProvider accessTokenProvider)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
-        School21WireParsing.RequireNonEmpty(options.Username, nameof(options.Username));
-        School21WireParsing.RequireNonEmpty(options.Password, nameof(options.Password));
+        ArgumentNullException.ThrowIfNull(accessTokenProvider);
         School21WireParsing.RequireNonEmpty(options.BaseUrl, nameof(options.BaseUrl));
-        School21WireParsing.RequireNonEmpty(options.TokenEndpoint, nameof(options.TokenEndpoint));
 
         _http = httpClient;
-        _options = options;
+        _accessTokenProvider = accessTokenProvider;
         _baseUrl = options.BaseUrl.TrimEnd('/');
 
         Participants = new ParticipantsResource(this);
@@ -71,7 +77,7 @@ public sealed class School21Client
     /// <summary>GET a single typed object from the API.</summary>
     internal async Task<T> GetAsync<T>(string relativePath, CancellationToken cancellationToken)
     {
-        var token = await GetAccessTokenAsync(cancellationToken).ConfigureAwait(false);
+        var token = await _accessTokenProvider.GetAccessTokenAsync(cancellationToken).ConfigureAwait(false);
         using var request = new HttpRequestMessage(HttpMethod.Get, _baseUrl + relativePath);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Headers.UserAgent.ParseAdd(UserAgent);
@@ -167,83 +173,7 @@ public sealed class School21Client
         return "?" + string.Join("&", parts);
     }
 
-    private async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
-    {
-        if (IsTokenFresh())
-        {
-            return _accessToken!;
-        }
-
-        await _tokenGate.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            if (IsTokenFresh())
-            {
-                return _accessToken!;
-            }
-
-            var form = new[]
-            {
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("client_id", _options.ClientId),
-                new KeyValuePair<string, string>("username", _options.Username),
-                new KeyValuePair<string, string>("password", _options.Password)
-            };
-
-            using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
-            {
-                Content = new FormUrlEncodedContent(form)
-            };
-            request.Headers.UserAgent.ParseAdd(UserAgent);
-
-            HttpResponseMessage response;
-            try
-            {
-                response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            }
-            catch (HttpRequestException exception)
-            {
-                throw new School21TransportException("School 21 token request failed before a response.", exception);
-            }
-
-            using (response)
-            {
-                var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw CreateApiException("<token>", response.StatusCode, body);
-                }
-
-                TokenResponse? token;
-                try
-                {
-                    token = JsonSerializer.Deserialize<TokenResponse>(body, Json);
-                }
-                catch (JsonException exception)
-                {
-                    throw new School21ProtocolException("School 21 token response was not valid JSON.", response.StatusCode, exception);
-                }
-
-                if (token is null || string.IsNullOrEmpty(token.AccessToken))
-                {
-                    throw new School21ProtocolException("School 21 token response contained no access_token.", response.StatusCode);
-                }
-
-                _accessToken = token.AccessToken;
-                var lifetime = Math.Max(30, token.ExpiresIn - _options.TokenRefreshSkewSeconds);
-                _accessTokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(lifetime);
-                return _accessToken;
-            }
-        }
-        finally
-        {
-            _tokenGate.Release();
-        }
-    }
-
-    private bool IsTokenFresh() => _accessToken is not null && DateTimeOffset.UtcNow < _accessTokenExpiresAt;
-
-    private static School21ApiException CreateApiException(string path, System.Net.HttpStatusCode statusCode, string body)
+    internal static School21ApiException CreateApiException(string path, System.Net.HttpStatusCode statusCode, string body)
     {
         School21Error? error = null;
         if (!string.IsNullOrWhiteSpace(body))
@@ -263,7 +193,7 @@ public sealed class School21Client
             statusCode,
             error?.Error,
             detail,
-            $"School 21 GET {path} returned HTTP {(int)statusCode} ({statusCode}){(detail is null ? "." : $": {detail}")}");
+            $"School 21 {path} returned HTTP {(int)statusCode} ({statusCode}){(detail is null ? "." : $": {detail}")}");
     }
 
     private static JsonSerializerOptions CreateJsonOptions()
