@@ -1,0 +1,74 @@
+name: Publish NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: 'Git ref to publish from, for example v1.0.0'
+        required: true
+        type: string
+      version:
+        description: 'Package version to publish, for example 1.0.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write        # required for NuGet Trusted Publishing (OIDC)
+
+jobs:
+  publish:
+    name: Publish NuGet Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.git_ref }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore School21Net.slnx
+
+      - name: Build
+        run: dotnet build School21Net.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test School21Net.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Pack Requested Version
+        run: >
+          dotnet pack src/School21Net/School21Net.csproj
+          --configuration Release
+          --no-build
+          --output artifacts/packages
+          -p:PackageVersion=${{ inputs.version }}
+          -p:Version=${{ inputs.version }}
+          -p:InformationalVersion=${{ inputs.version }}
+
+      # NuGet Trusted Publishing (OIDC): mint a short-lived API key from the GitHub token.
+      # Requires a trusted publishing policy on NuGet.org and the NUGET_USER repository variable.
+      - name: NuGet Trusted Publishing Login
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Publish Package
+        run: >
+          dotnet nuget push artifacts/packages/School21Net.${{ inputs.version }}.nupkg
+          --source https://api.nuget.org/v3/index.json
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
+          --skip-duplicate
+
+      - name: Publish Symbols
+        run: >
+          dotnet nuget push artifacts/packages/School21Net.${{ inputs.version }}.snupkg
+          --source https://api.nuget.org/v3/index.json
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
+          --skip-duplicate
