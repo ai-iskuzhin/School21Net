@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/School21Net/School21Net.csproj" />
+  <Project Path="tests/School21Net.Tests/School21Net.Tests.csproj" />
+</Solution>
