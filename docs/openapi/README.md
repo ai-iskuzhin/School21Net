@@ -50,6 +50,9 @@ sharing one name. Do not map one onto the other.
 **`logtime` returns a bare number**, not an object, so the client returns `double` rather than
 inventing a wrapper the API does not have.
 
-**Every wire enum needs a converter registered** in `School21Client`. A missing registration compiles
-and passes every test that does not exercise that field, then throws the first time the value arrives
-from the real API.
+**Enum converters register themselves** via `ScreamingSnakeEnumConverterFactory`, so adding an enum
+needs no wiring. This replaced a per-enum list that compiled cleanly when an entry was missing and
+failed only against the real API.
+
+**Declare enum properties as nullable.** An unknown value on a nullable property reads as `null`; on
+a non-nullable one it throws, because there is nowhere to put it. A test asserts no model has one.

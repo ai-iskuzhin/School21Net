@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.1.0 — 2026-08-07
+
+Full coverage of the public API, and enums that survive the school extending its vocabulary.
+
+### Added — every endpoint in the spec
+
+Coverage goes from 11 of 25 paths to **25 of 25**, checked mechanically against
+`docs/openapi/school21-openapi.json`, which is now kept in the repository.
+
+- `client.Events` — campus events over a window, optionally filtered by kind.
+- `client.Clusters` — cluster maps, optionally only occupied seats.
+- `client.Courses` — a curriculum course.
+- `client.Graph` — the curriculum graph, nodes and edges.
+- `client.Sales` — PRP and CRP sale windows.
+- `client.Projects.GetAsync` — a curriculum project, including whether it is a group project.
+- `client.Campuses.GetClustersAsync` — clusters in a campus.
+- `client.Participants` — `GetBadgesAsync`, `GetSkillsAsync`, `GetWorkstationAsync`,
+  `GetLogtimeAsync`, `GetExperienceHistoryAsync`, `GetCoursesAsync`, `GetCourseAsync`.
+
+### Changed — an unknown enum value no longer fails the response
+
+**This is a behaviour change and the reason for it is worth reading.** A nullable enum property used
+to throw when the API sent a value this version did not know. For a client library that means the
+day 21School adds a participant status, *every* call whose response contains it fails — profile sync
+stops for those members over one field the caller may not even read.
+
+Unknown values on nullable properties now read as `null`. A non-nullable enum still throws, because
+it has nowhere to put an unknown; a test asserts no model declares one.
+
+If you were catching `JsonException` to detect new server values, check for `null` instead.
+
+### Fixed
+
+- Enum converters are registered by a factory instead of one line per enum. The old list was a trap:
+  omitting an entry compiled, passed every test that did not exercise that field, and failed only
+  against the real API — which is exactly how `SaleType` was found.
+- `EventsResource` formats `from`/`to` as zoned UTC instants. The API rejects `2026-08-01` *and*
+  `2026-08-01T00:00:00` with a bare `400 Bad Request` naming no field; only `…T00:00:00Z` is
+  accepted, and local times are converted rather than relabelled so a window cannot silently shift.
+
 ## 2.0.0 — 2026-07-26
 
 Breaking: auth is now owned by the integrator, not the SDK.

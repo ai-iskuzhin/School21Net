@@ -30,7 +30,8 @@ Targets `net8.0` and `net10.0` (in-box `System.Text.Json`). **No third-party dep
 - Integrator-owned auth: a stateless `School21AuthClient` issues/refreshes tokens (ROPC password + `refresh_token` grants); the API client reads the bearer from a pluggable `ISchool21AccessTokenProvider`
 - Resources: **Participants**, **Projects**, **Campuses**, **Coalitions**
 - Per-project participant lists filterable by status — `Accepted` (finished) / `InReviews` (awaiting review)
-- Tolerant `SCREAMING_SNAKE` enum converters that raise on unknown values
+- `SCREAMING_SNAKE` enum converters, registered by factory; an unknown value on a nullable
+  property reads as `null` rather than failing the whole response
 - Layered exceptions: `School21ApiException` / `School21ProtocolException` / `School21TransportException` / `School21ValidationException`
 
 ## Quick start

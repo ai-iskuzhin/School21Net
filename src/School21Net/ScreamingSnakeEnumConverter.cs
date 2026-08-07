@@ -6,8 +6,10 @@ namespace School21Net;
 
 /// <summary>
 /// Converts between C# enum members (PascalCase) and the API's <c>SCREAMING_SNAKE_CASE</c> wire values —
-/// e.g. <c>InReviews</c> ⇄ <c>IN_REVIEWS</c>. Reading an unrecognised value throws a descriptive
-/// <see cref="JsonException"/> rather than silently mapping to 0, so new server values surface loudly.
+/// e.g. <c>InReviews</c> ⇄ <c>IN_REVIEWS</c>. Reading an unrecognised value throws rather than
+/// silently mapping to 0 — but only for a non-nullable property, which has nowhere to put an unknown.
+/// Nullable properties go through <see cref="TolerantScreamingSnakeEnumConverter{T}"/> and answer
+/// <c>null</c>, so a vocabulary the school extends cannot fail a whole response.
 /// </summary>
 internal sealed class ScreamingSnakeEnumConverter<T> : JsonConverter<T>
     where T : struct, Enum
@@ -18,17 +20,32 @@ internal sealed class ScreamingSnakeEnumConverter<T> : JsonConverter<T>
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var raw = reader.GetString();
-        if (raw is not null && FromWire.TryGetValue(Normalize(raw), out var value))
+
+        if (TryParse(raw, out var value))
         {
             return value;
         }
 
+        // Strict, and only because a non-nullable property has nowhere to put "unknown". Every
+        // nullable one is read by TolerantScreamingSnakeEnumConverter instead, which answers null.
         throw School21WireParsing.UnknownEnumValue(typeof(T).Name, raw);
     }
 
     /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         => writer.WriteStringValue(ToWire(value));
+
+    /// <summary>The enum member for a wire value, if this version knows it.</summary>
+    internal static bool TryParse(string? raw, out T value)
+    {
+        if (raw is not null && FromWire.TryGetValue(Normalize(raw), out value))
+        {
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
 
     /// <summary>Render an enum value as its <c>SCREAMING_SNAKE_CASE</c> wire form (also used for query params).</summary>
     public static string ToWire(T value) => ToScreamingSnake(value.ToString());

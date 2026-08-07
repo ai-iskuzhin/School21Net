@@ -224,18 +224,10 @@ public sealed class School21Client
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
-        options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantStatus>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantProjectType>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantProjectStatus>());
 
-        // Every enum on the wire needs registering here, and forgetting one fails only at the moment
-        // that field first arrives with a value — a test that never exercises the endpoint will not
-        // notice. Added alongside the models they belong to.
-        options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantCourseStatus>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<SaleType>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<SaleStatus>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<GraphEntityType>());
-        options.Converters.Add(new ScreamingSnakeEnumConverter<EventType>());
+        // One factory, not one line per enum. The list it replaces was a standing invitation to
+        // forget an entry, and forgetting compiled cleanly and failed only against the real API.
+        options.Converters.Add(new ScreamingSnakeEnumConverterFactory());
         return options;
     }
 

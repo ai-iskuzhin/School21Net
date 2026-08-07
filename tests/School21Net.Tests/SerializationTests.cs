@@ -39,11 +39,20 @@ public sealed class SerializationTests
         Assert.Equal(ParticipantProjectType.Individual, project.Type);
     }
 
+    /// <summary>
+    /// This asserted a throw until 2.1.0, and the change is deliberate. A nullable enum is the model
+    /// saying "the school may say something I do not know"; failing the whole response over one such
+    /// field turned a vocabulary the school extends into an outage for every object carrying it.
+    /// </summary>
     [Fact]
-    public void Unknown_enum_value_throws()
+    public void Unknown_enum_value_reads_as_null_and_leaves_the_rest_intact()
     {
         const string json = """{"id":1,"title":"x","status":"TELEPORTED"}""";
 
-        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ParticipantProject>(json, School21Client.Json));
+        var project = JsonSerializer.Deserialize<ParticipantProject>(json, School21Client.Json)!;
+
+        Assert.Null(project.Status);
+        Assert.Equal(1, project.Id);
+        Assert.Equal("x", project.Title);
     }
 }
