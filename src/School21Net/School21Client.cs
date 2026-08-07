@@ -60,6 +60,11 @@ public sealed class School21Client
         Projects = new ProjectsResource(this);
         Campuses = new CampusesResource(this);
         Coalitions = new CoalitionsResource(this);
+        Events = new EventsResource(this);
+        Clusters = new ClustersResource(this);
+        Courses = new CoursesResource(this);
+        Graph = new GraphResource(this);
+        Sales = new SalesResource(this);
     }
 
     /// <summary>Participant-scoped endpoints (basic info, projects, coalition, points, feedback).</summary>
@@ -73,6 +78,21 @@ public sealed class School21Client
 
     /// <summary>Coalition-scoped endpoints (coalition participant lists).</summary>
     public CoalitionsResource Coalitions { get; }
+
+    /// <summary>Campus events.</summary>
+    public EventsResource Events { get; }
+
+    /// <summary>Cluster maps.</summary>
+    public ClustersResource Clusters { get; }
+
+    /// <summary>Curriculum courses.</summary>
+    public CoursesResource Courses { get; }
+
+    /// <summary>The curriculum graph.</summary>
+    public GraphResource Graph { get; }
+
+    /// <summary>Points sales.</summary>
+    public SalesResource Sales { get; }
 
     /// <summary>GET a single typed object from the API.</summary>
     internal async Task<T> GetAsync<T>(string relativePath, CancellationToken cancellationToken)
@@ -207,6 +227,15 @@ public sealed class School21Client
         options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantStatus>());
         options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantProjectType>());
         options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantProjectStatus>());
+
+        // Every enum on the wire needs registering here, and forgetting one fails only at the moment
+        // that field first arrives with a value — a test that never exercises the endpoint will not
+        // notice. Added alongside the models they belong to.
+        options.Converters.Add(new ScreamingSnakeEnumConverter<ParticipantCourseStatus>());
+        options.Converters.Add(new ScreamingSnakeEnumConverter<SaleType>());
+        options.Converters.Add(new ScreamingSnakeEnumConverter<SaleStatus>());
+        options.Converters.Add(new ScreamingSnakeEnumConverter<GraphEntityType>());
+        options.Converters.Add(new ScreamingSnakeEnumConverter<EventType>());
         return options;
     }
 

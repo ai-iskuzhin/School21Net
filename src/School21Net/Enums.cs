@@ -51,3 +51,65 @@ public enum ParticipantProjectStatus
     /// <summary>FAILED — completed and failed.</summary>
     Failed
 }
+
+/// <summary>
+/// The event kinds the <c>type</c> filter accepts on <c>GET /v1/events</c>.
+/// <para>
+/// Deliberately not the same vocabulary as <see cref="SchoolEvent.Type"/>, which is free text the
+/// campus writes ("Клуб", "Митап"). Filtering and reading use different words; do not map one onto
+/// the other.
+/// </para>
+/// </summary>
+public enum EventType
+{
+    /// <summary>ACTIVITY.</summary>
+    Activity,
+    /// <summary>EXAM.</summary>
+    Exam,
+    /// <summary>TEST.</summary>
+    Test
+}
+
+/// <summary>Status of a course on a participant's roadmap.</summary>
+public enum ParticipantCourseStatus
+{
+    /// <summary>ASSIGNED.</summary>
+    Assigned,
+    /// <summary>REGISTERED.</summary>
+    Registered,
+    /// <summary>IN_PROGRESS.</summary>
+    InProgress,
+    /// <summary>ACCEPTED.</summary>
+    Accepted,
+    /// <summary>FAILED.</summary>
+    Failed
+}
+
+/// <summary>Which points currency a sale applies to.</summary>
+public enum SaleType
+{
+    /// <summary>PRP — peer review points.</summary>
+    Prp,
+    /// <summary>CRP — code review points.</summary>
+    Crp
+}
+
+/// <summary>Whether a sale is running.</summary>
+public enum SaleStatus
+{
+    /// <summary>NON_ACTIVE.</summary>
+    NonActive,
+    /// <summary>ACTIVE.</summary>
+    Active,
+    /// <summary>PLANNED.</summary>
+    Planned
+}
+
+/// <summary>What a curriculum graph node item stands for.</summary>
+public enum GraphEntityType
+{
+    /// <summary>PROJECT.</summary>
+    Project,
+    /// <summary>COURSE.</summary>
+    Course
+}

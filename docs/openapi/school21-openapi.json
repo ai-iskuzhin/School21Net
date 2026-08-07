@@ -1,0 +1,4073 @@
+{
+  "components": {
+    "schemas": {
+      "CampusV1DTO": {
+        "description": "Campus",
+        "properties": {
+          "fullName": {
+            "description": "Full campus name",
+            "example": "Hogwarts School of Witchcraft and Wizardry",
+            "type": "string"
+          },
+          "id": {
+            "description": "Campus ID",
+            "example": "ff19a3a7-12f5-4332-9582-624519c3eaea",
+            "format": "uuid",
+            "type": "string"
+          },
+          "shortName": {
+            "description": "Short campus name",
+            "example": "Hogwarts",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fullName",
+          "id",
+          "shortName"
+        ],
+        "type": "object"
+      },
+      "CampusesV1DTO": {
+        "description": "Campuses",
+        "properties": {
+          "campuses": {
+            "description": "Array of campus objects",
+            "items": {
+              "$ref": "#/components/schemas/CampusV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "campuses"
+        ],
+        "type": "object"
+      },
+      "ClusterMapV1DTO": {
+        "description": "Cluster map",
+        "properties": {
+          "clusterMap": {
+            "description": "Array of cluster places",
+            "items": {
+              "$ref": "#/components/schemas/WorkplaceV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "clusterMap"
+        ],
+        "type": "object"
+      },
+      "ClusterV1DTO": {
+        "description": "Cluster",
+        "properties": {
+          "availableCapacity": {
+            "description": "Number of available seats",
+            "example": 22,
+            "format": "int32",
+            "type": "integer"
+          },
+          "capacity": {
+            "description": "Cluster capacity",
+            "example": 30,
+            "format": "int32",
+            "type": "integer"
+          },
+          "floor": {
+            "description": "The floor where the cluster is located",
+            "example": 2,
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": {
+            "description": "Cluster ID",
+            "example": 824,
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Cluster name",
+            "example": "Ocean",
+            "type": "string"
+          }
+        },
+        "required": [
+          "availableCapacity",
+          "capacity",
+          "floor",
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "ClustersV1DTO": {
+        "description": "Clusters",
+        "properties": {
+          "clusters": {
+            "description": "Array of cluster objects",
+            "items": {
+              "$ref": "#/components/schemas/ClusterV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "clusters"
+        ],
+        "type": "object"
+      },
+      "CoalitionV1DTO": {
+        "description": "Coalition",
+        "properties": {
+          "coalitionId": {
+            "description": "Coalition ID",
+            "example": 319,
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Coalition name",
+            "example": "Capybaras",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coalitionId",
+          "name"
+        ],
+        "type": "object"
+      },
+      "CoalitionsV1DTO": {
+        "description": "Coalitions",
+        "properties": {
+          "coalitions": {
+            "description": "Array of coalition objects",
+            "items": {
+              "$ref": "#/components/schemas/CoalitionV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "coalitions"
+        ],
+        "type": "object"
+      },
+      "ConditionRuleGroupV1DTO": {
+        "description": "A system of conditions for project completion, organized into groups that are combined using logical operators (AND or OR). Conditions within each group can also be linked by these operators. Each condition evaluates a parameter (like XP or project status) using comparison operators (IN, =, >, <).",
+        "nullable": true,
+        "properties": {
+          "logicalOperator": {
+            "description": "A logical operator that connects the current group to the preceding condition groups. This value may be null when this is the first group within the structure.",
+            "enum": [
+              "OR",
+              "AND"
+            ],
+            "example": "null",
+            "nullable": true,
+            "type": "string"
+          },
+          "rulesInGroup": {
+            "description": "An array of conditions that form a single group. These conditions are linked together using logical operators.",
+            "items": {
+              "$ref": "#/components/schemas/ConditionRuleV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "rulesInGroup"
+        ],
+        "type": "object"
+      },
+      "ConditionRuleV1DTO": {
+        "description": "Condition in the condition group",
+        "properties": {
+          "logicalOperator": {
+            "description": "A logical operator that links the current condition to the preceding conditions within the group. This value may be null if this is the first condition in the group.",
+            "enum": [
+              "OR",
+              "AND"
+            ],
+            "example": "null",
+            "nullable": true,
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ConditionRuleValueV1DTO"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
+      "ConditionRuleValueV1DTO": {
+        "description": "A condition object that contains information about the parameter to be evaluated and the value being checked.",
+        "properties": {
+          "fieldId": {
+            "description": "A unique identifier for the parameter being checked.",
+            "example": 1,
+            "format": "int64",
+            "type": "integer"
+          },
+          "fieldName": {
+            "description": "The name of the parameter being checked. Examples: \"Projects in status\", \"XP\", \"Skill\", \"Level\", \"Days on the course\", \"Project Cluster in status\", \"Retry is not available if project accepted/failed\"",
+            "example": "Projects in status",
+            "type": "string"
+          },
+          "operator": {
+            "description": "The operator used to compare values or check if the value belongs to a specific set. Examples: \"IN\", \">\", \"<\", \"=\"",
+            "example": "IN",
+            "type": "string"
+          },
+          "subFieldKey": {
+            "description": "The identifier for the subcategory of the parameter being checked (if applicable). Example of subcategory: clarification, such as which specific project status or skill is being checked.",
+            "example": "1",
+            "nullable": true,
+            "type": "string"
+          },
+          "subFieldValue": {
+            "description": "The value of the subcategory for the parameter being checked (if applicable), such as the project status or skill name. Status values (\"REGISTERED/IN PROGRESS\", \"REVIEWING\", \"ACCEPTED\", \"NOT REGISTERED\") can apply to parameters like \"Project in status\" or \"Project Cluster in status\"; skill names apply to the skill parameter; null if the parameter does not have a subcategory.\n",
+            "example": "REGISTERED/IN PROGRESS",
+            "nullable": true,
+            "type": "string"
+          },
+          "value": {
+            "description": "An array of value objects to compare against. For such parameters as \"Projects in status\" and \"Project Cluster in status,\" it may contain multiple project/course objects.",
+            "items": {
+              "$ref": "#/components/schemas/ConditionValueValueV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "fieldId",
+          "fieldName",
+          "operator",
+          "value"
+        ],
+        "type": "object"
+      },
+      "ConditionValueValueV1DTO": {
+        "description": "Array of condition values",
+        "properties": {
+          "key": {
+            "description": "The identifier or numeric value to be compared with the participant's value (e.g., project ID or skill points).",
+            "example": "19885",
+            "type": "string"
+          },
+          "value": {
+            "description": "Parameter value. The name for projects or courses; null for numeric validation (e.g., XP or skill).",
+            "example": "SQL_exam_test",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "type": "object"
+      },
+      "CourseV1DTO": {
+        "description": "Course",
+        "properties": {
+          "courseId": {
+            "description": "Course ID",
+            "example": 123131,
+            "format": "int64",
+            "type": "integer"
+          },
+          "description": {
+            "description": "Course description",
+            "example": "A group of projects to master SQL syntax.",
+            "type": "string"
+          },
+          "durationHours": {
+            "description": "Course duration (in hours)",
+            "example": 30,
+            "format": "int32",
+            "type": "integer"
+          },
+          "startConditions": {
+            "description": "Array of condition group objects",
+            "items": {
+              "$ref": "#/components/schemas/ConditionRuleGroupV1DTO"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "title": {
+            "description": "Course name",
+            "example": "SQL Bootcamp",
+            "type": "string"
+          },
+          "xp": {
+            "description": "XP per course",
+            "example": 1500,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "courseId",
+          "description",
+          "durationHours",
+          "title",
+          "xp"
+        ],
+        "type": "object"
+      },
+      "ErrorResponseDTO": {
+        "description": "ErrorResponseDTO",
+        "properties": {
+          "code": {
+            "description": "code",
+            "type": "string"
+          },
+          "exceptionUUID": {
+            "description": "a unique generated error code from the service",
+            "type": "string"
+          },
+          "message": {
+            "description": "message",
+            "type": "string"
+          },
+          "status": {
+            "description": "status",
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "exceptionUUID",
+          "message",
+          "status"
+        ],
+        "type": "object"
+      },
+      "EventV1DTO": {
+        "description": "Event",
+        "properties": {
+          "capacity": {
+            "description": "Maximum number of participants who can register for the event",
+            "example": 20,
+            "format": "int32",
+            "type": "integer"
+          },
+          "description": {
+            "description": "Event description",
+            "example": "We'll learn how to make a bowl out of clay",
+            "nullable": true,
+            "type": "string"
+          },
+          "endDateTime": {
+            "description": "Date and time of the end of the event (UTC)",
+            "example": "2024-01-24T10:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "description": "Event ID",
+            "example": 312,
+            "format": "int64",
+            "type": "integer"
+          },
+          "location": {
+            "description": "Location of the event",
+            "example": "Ocean cluster",
+            "type": "string"
+          },
+          "name": {
+            "description": "Event name",
+            "example": "Clay modeling tutorial",
+            "type": "string"
+          },
+          "organizers": {
+            "description": "Array of strings with the logins of the organizing participants",
+            "items": {
+              "example": "bibikov_lukyan",
+              "nullable": true,
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "registerCount": {
+            "description": "Current number of participants registered for the event",
+            "example": 10,
+            "format": "int32",
+            "type": "integer"
+          },
+          "startDateTime": {
+            "description": "Date and time of the start of the event (UTC)",
+            "example": "2024-01-24T10:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": {
+            "description": "Event type",
+            "example": "Workshop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capacity",
+          "endDateTime",
+          "id",
+          "location",
+          "name",
+          "registerCount",
+          "startDateTime",
+          "type"
+        ],
+        "type": "object"
+      },
+      "EventsV1DTO": {
+        "description": "Events",
+        "properties": {
+          "events": {
+            "description": "Array of events",
+            "items": {
+              "$ref": "#/components/schemas/EventV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "type": "object"
+      },
+      "GraphEdgeV1DTO": {
+        "description": "Graph edge",
+        "properties": {
+          "id": {
+            "description": "Edge ID",
+            "example": "d24d3bd24d3b-jh75ii-left-jh5fa4jh5fa4-da8784-right",
+            "type": "string"
+          },
+          "source": {
+            "description": "Source node ID",
+            "example": "d24d3b",
+            "type": "string"
+          },
+          "sourceHandle": {
+            "description": "Source handle ID",
+            "example": "d24d3b-jh75ii-left",
+            "type": "string"
+          },
+          "target": {
+            "description": "Target node ID",
+            "example": "jh5fa4",
+            "type": "string"
+          },
+          "targetHandle": {
+            "description": "Target handle ID",
+            "example": "jh5fa4-da8784-right",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "sourceHandle",
+          "target",
+          "targetHandle"
+        ],
+        "type": "object"
+      },
+      "GraphNodeItemV1DTO": {
+        "description": "Graph node item",
+        "properties": {
+          "code": {
+            "description": "Node item code in the graph",
+            "example": "APP5",
+            "type": "string"
+          },
+          "entityId": {
+            "description": "ID of the entity linked to the node item",
+            "example": 12879,
+            "format": "int64",
+            "type": "integer"
+          },
+          "entityType": {
+            "description": "Node item type",
+            "enum": [
+              "PROJECT",
+              "COURSE"
+            ],
+            "example": "PROJECT",
+            "type": "string"
+          },
+          "handles": {
+            "description": "Handles for connecting node items",
+            "items": {
+              "example": "d24d3b-jh75ii-left",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "id": {
+            "description": "Node item ID",
+            "example": "d24d3b-jh75ii",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "entityId",
+          "entityType",
+          "handles",
+          "id"
+        ],
+        "type": "object"
+      },
+      "GraphNodeV1DTO": {
+        "description": "Graph node",
+        "properties": {
+          "id": {
+            "description": "Node ID",
+            "example": "d24d3b",
+            "type": "string"
+          },
+          "items": {
+            "description": "Node items",
+            "items": {
+              "$ref": "#/components/schemas/GraphNodeItemV1DTO"
+            },
+            "type": "array"
+          },
+          "label": {
+            "description": "Node name",
+            "example": "APP",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "items",
+          "label"
+        ],
+        "type": "object"
+      },
+      "GraphV1DTO": {
+        "description": "Graph",
+        "properties": {
+          "edges": {
+            "description": "Array of graph edges",
+            "items": {
+              "$ref": "#/components/schemas/GraphEdgeV1DTO"
+            },
+            "type": "array"
+          },
+          "nodes": {
+            "description": "Array of graph nodes",
+            "items": {
+              "$ref": "#/components/schemas/GraphNodeV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "edges",
+          "nodes"
+        ],
+        "type": "object"
+      },
+      "ParticipantBadgeV1DTO": {
+        "description": "Participant Badge",
+        "properties": {
+          "iconUrl": {
+            "description": "URL of the badge icon",
+            "example": "/public_any/b195ab4d-9587-4e29-9de0-ff33a8d8913e?path=badges/Cheater.png",
+            "type": "string"
+          },
+          "name": {
+            "description": "Badge name",
+            "example": "Cheat",
+            "type": "string"
+          },
+          "receiptDateTime": {
+            "description": "Date and time of the receipt (UTC)",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "iconUrl",
+          "name",
+          "receiptDateTime"
+        ],
+        "type": "object"
+      },
+      "ParticipantBadgesV1DTO": {
+        "description": "Participant Badges",
+        "properties": {
+          "badges": {
+            "description": "Array of badges",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantBadgeV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "badges"
+        ],
+        "type": "object"
+      },
+      "ParticipantCampusV1DTO": {
+        "description": "Participant Campus",
+        "properties": {
+          "id": {
+            "description": "Campus ID",
+            "example": "ff19a3a7-12f5-4332-9582-624519c3eaea",
+            "format": "uuid",
+            "type": "string"
+          },
+          "shortName": {
+            "description": "Short campus name",
+            "example": "Hogwarts",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "shortName"
+        ],
+        "type": "object"
+      },
+      "ParticipantCoalitionV1DTO": {
+        "description": "Participant Coalition",
+        "properties": {
+          "coalitionId": {
+            "description": "Coalition ID",
+            "example": 319,
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Coalition name",
+            "example": "Capybaras",
+            "type": "string"
+          },
+          "rank": {
+            "description": "Rank of the participant",
+            "example": 20,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "coalitionId",
+          "name"
+        ],
+        "type": "object"
+      },
+      "ParticipantCourseV1DTO": {
+        "description": "Participant Course",
+        "properties": {
+          "completionDateTime": {
+            "description": "Date and time of the last completion (UTC)",
+            "example": "2024-01-23T00:00:00Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "finalPercentage": {
+            "description": "Final percentage of completion",
+            "example": 21,
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "description": "Course ID",
+            "example": 341241,
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "description": "Course status",
+            "enum": [
+              "ASSIGNED",
+              "REGISTERED",
+              "IN_PROGRESS",
+              "ACCEPTED",
+              "FAILED"
+            ],
+            "example": "REGISTERED",
+            "type": "string"
+          },
+          "title": {
+            "description": "Course name",
+            "example": "SQL Bootcamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "title"
+        ],
+        "type": "object"
+      },
+      "ParticipantCoursesV1DTO": {
+        "description": "Participant Courses",
+        "properties": {
+          "courses": {
+            "description": "Array of courses",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantCourseV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "courses"
+        ],
+        "type": "object"
+      },
+      "ParticipantFeedbackV1DTO": {
+        "description": "Participant Feedback",
+        "properties": {
+          "averageVerifierFriendliness": {
+            "description": "Average friendliness score for a peer review",
+            "example": 3.5,
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "averageVerifierInterest": {
+            "description": "Average interest score for a peer review",
+            "example": 3.27,
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "averageVerifierPunctuality": {
+            "description": "Average punctuality score for a peer review",
+            "example": 4.0,
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          },
+          "averageVerifierThoroughness": {
+            "description": "Average thoroughness score for a peer review",
+            "example": 3.99,
+            "format": "double",
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "ParticipantLoginsV1DTO": {
+        "description": "Participant logins",
+        "properties": {
+          "participants": {
+            "description": "Array of participant logins",
+            "items": {
+              "example": "bibikov-lukyan",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "participants"
+        ],
+        "type": "object"
+      },
+      "ParticipantPointsV1DTO": {
+        "description": "Participant Points",
+        "properties": {
+          "codeReviewPoints": {
+            "description": "Participant’s number of Code Review Points",
+            "example": 5,
+            "format": "int32",
+            "type": "integer"
+          },
+          "coins": {
+            "description": "Participant’s number of coins",
+            "example": 4,
+            "format": "int32",
+            "type": "integer"
+          },
+          "peerReviewPoints": {
+            "description": "Participant’s number of Peer Review Points",
+            "example": 10,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "codeReviewPoints",
+          "coins",
+          "peerReviewPoints"
+        ],
+        "type": "object"
+      },
+      "ParticipantProjectV1DTO": {
+        "description": "Participant Project",
+        "properties": {
+          "completionDateTime": {
+            "description": "Date and time of the last completion (UTC)",
+            "example": "2024-01-23T00:00:00Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "courseId": {
+            "description": "ID of the course where the project is located",
+            "example": 452341,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          },
+          "finalPercentage": {
+            "description": "Final percentage of completion",
+            "example": 110,
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "description": "Project ID",
+            "example": 13453,
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "description": "Project status",
+            "enum": [
+              "ASSIGNED",
+              "REGISTERED",
+              "IN_PROGRESS",
+              "IN_REVIEWS",
+              "ACCEPTED",
+              "FAILED"
+            ],
+            "example": "REGISTERED",
+            "type": "string"
+          },
+          "teamMembers": {
+            "description": "Team members of the last attempt",
+            "items": {
+              "$ref": "#/components/schemas/TeamMemberV1DTO"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "title": {
+            "description": "Project name",
+            "example": "String+",
+            "type": "string"
+          },
+          "type": {
+            "description": "Project type",
+            "enum": [
+              "INDIVIDUAL",
+              "GROUP",
+              "EXAM",
+              "EXAM_TEST",
+              "INTERNSHIP"
+            ],
+            "example": "INDIVIDUAL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "title",
+          "type"
+        ],
+        "type": "object"
+      },
+      "ParticipantProjectsV1DTO": {
+        "description": "Participant Projects",
+        "properties": {
+          "projects": {
+            "description": "Array of projects",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantProjectV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "type": "object"
+      },
+      "ParticipantSkillV1DTO": {
+        "description": "Participant Skill",
+        "properties": {
+          "name": {
+            "description": "Skill name",
+            "example": "Java",
+            "type": "string"
+          },
+          "points": {
+            "description": "Skill points",
+            "example": 80,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "points"
+        ],
+        "type": "object"
+      },
+      "ParticipantSkillsV1DTO": {
+        "description": "Participant Skills",
+        "properties": {
+          "skills": {
+            "description": "Array of skills",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantSkillV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "skills"
+        ],
+        "type": "object"
+      },
+      "ParticipantV1DTO": {
+        "description": "Participant",
+        "properties": {
+          "campus": {
+            "$ref": "#/components/schemas/ParticipantCampusV1DTO"
+          },
+          "className": {
+            "description": "Participant class name (wave)",
+            "example": "ADONIS",
+            "nullable": true,
+            "type": "string"
+          },
+          "expToNextLevel": {
+            "description": "Number of experience points to the next level",
+            "example": 399,
+            "format": "int64",
+            "type": "integer"
+          },
+          "expValue": {
+            "description": "Experience points",
+            "example": 100,
+            "format": "int64",
+            "type": "integer"
+          },
+          "level": {
+            "description": "Participant level",
+            "example": 0,
+            "format": "int32",
+            "type": "integer"
+          },
+          "login": {
+            "description": "Participant login",
+            "example": "bibikov-lukyan",
+            "type": "string"
+          },
+          "parallelName": {
+            "description": "Participant parallel name (edu form)",
+            "example": "Core program",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "Participant status",
+            "enum": [
+              "ACTIVE",
+              "TEMPORARY_BLOCKING",
+              "EXPELLED",
+              "BLOCKED",
+              "FROZEN",
+              "STUDY_COMPLETED"
+            ],
+            "example": "Active",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campus",
+          "expToNextLevel",
+          "expValue",
+          "level",
+          "login",
+          "status"
+        ],
+        "type": "object"
+      },
+      "ParticipantWorkstationV1DTO": {
+        "description": "Participant Workstation",
+        "properties": {
+          "clusterId": {
+            "description": "Cluster ID",
+            "example": 854,
+            "format": "int64",
+            "type": "integer"
+          },
+          "clusterName": {
+            "description": "Cluster name",
+            "example": "Ocean",
+            "type": "string"
+          },
+          "number": {
+            "description": "Number of a workplace",
+            "example": 24,
+            "format": "int32",
+            "type": "integer"
+          },
+          "row": {
+            "description": "Row of a workplace",
+            "example": "a",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clusterId",
+          "clusterName",
+          "number",
+          "row"
+        ],
+        "type": "object"
+      },
+      "ParticipantXpHistoryItemV1DTO": {
+        "description": "Xp History Item",
+        "properties": {
+          "accrualDateTime": {
+            "description": "Date and time of XP accrual (UTC)",
+            "example": "2024-01-24T00:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "expValue": {
+            "description": "XP value",
+            "example": 100,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "accrualDateTime",
+          "expValue"
+        ],
+        "type": "object"
+      },
+      "ParticipantXpHistoryV1DTO": {
+        "description": "Xp History",
+        "properties": {
+          "expHistory": {
+            "description": "Array of xp history items",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantXpHistoryItemV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "expHistory"
+        ],
+        "type": "object"
+      },
+      "ProjectV1DTO": {
+        "description": "Project",
+        "properties": {
+          "courseId": {
+            "description": "Course ID",
+            "example": 452341,
+            "format": "int64",
+            "nullable": true,
+            "type": "integer"
+          },
+          "description": {
+            "description": "Project description",
+            "example": "Learn to use a regex library",
+            "type": "string"
+          },
+          "durationHours": {
+            "description": "Project duration (in hours)",
+            "example": 20,
+            "format": "int32",
+            "type": "integer"
+          },
+          "projectId": {
+            "description": "Project ID",
+            "example": 134411,
+            "format": "int64",
+            "type": "integer"
+          },
+          "startConditions": {
+            "description": "Array of condition group objects",
+            "items": {
+              "$ref": "#/components/schemas/ConditionRuleGroupV1DTO"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "title": {
+            "description": "Project name",
+            "example": "P01D06",
+            "type": "string"
+          },
+          "type": {
+            "description": "Project type",
+            "enum": [
+              "INDIVIDUAL",
+              "GROUP",
+              "EXAM",
+              "EXAM_TEST",
+              "INTERNSHIP"
+            ],
+            "example": "GROUP",
+            "type": "string"
+          },
+          "xp": {
+            "description": "XP per Project",
+            "example": 200,
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "description",
+          "durationHours",
+          "projectId",
+          "title",
+          "type"
+        ],
+        "type": "object"
+      },
+      "SaleV1DTO": {
+        "description": "Sale",
+        "properties": {
+          "progressPercentage": {
+            "description": "Percentage of sale progress. Returns the value if the sale status equals ACTIVE. Otherwise returns null",
+            "example": 97,
+            "format": "int32",
+            "nullable": true,
+            "type": "integer"
+          },
+          "startDateTime": {
+            "description": "Date and time of the sale start (UTC). Returns the value if the sale status equals PLANNED or ACTIVE. Otherwise returns null",
+            "example": "2024-01-24T11:30:00Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "Sale status",
+            "enum": [
+              "NON_ACTIVE",
+              "ACTIVE",
+              "PLANNED"
+            ],
+            "example": "PLANNED",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of review points",
+            "enum": [
+              "PRP",
+              "CRP"
+            ],
+            "example": "CRP",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "type"
+        ],
+        "type": "object"
+      },
+      "SalesV1DTO": {
+        "description": "Sales",
+        "properties": {
+          "sales": {
+            "description": "Array of sales data",
+            "items": {
+              "$ref": "#/components/schemas/SaleV1DTO"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sales"
+        ],
+        "type": "object"
+      },
+      "TeamMemberV1DTO": {
+        "description": "Team Member",
+        "nullable": true,
+        "properties": {
+          "isTeamlead": {
+            "description": "Team member role",
+            "example": true,
+            "type": "boolean"
+          },
+          "login": {
+            "description": "Team member login",
+            "example": "yanchin-kim",
+            "type": "string"
+          }
+        },
+        "required": [
+          "isTeamlead",
+          "login"
+        ],
+        "type": "object"
+      },
+      "WorkplaceV1DTO": {
+        "description": "Workplace",
+        "properties": {
+          "login": {
+            "description": "Login of the participant occupying the place",
+            "example": "bibikov-lukyan",
+            "nullable": true,
+            "type": "string"
+          },
+          "number": {
+            "description": "Number of a workplace",
+            "example": 24,
+            "format": "int32",
+            "type": "integer"
+          },
+          "row": {
+            "description": "Row of a workplace",
+            "example": "a",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "row"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "Authorization": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "School21 OpenAPI Specification",
+    "version": "v1"
+  },
+  "openapi": "3.0.1",
+  "paths": {
+    "/v1/campuses": {
+      "get": {
+        "operationId": "getCampuses",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampusesV1DTO"
+                }
+              }
+            },
+            "description": "List of campuses"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of campuses",
+        "tags": [
+          "Campus"
+        ]
+      }
+    },
+    "/v1/campuses/{campusId}/clusters": {
+      "get": {
+        "operationId": "getClustersByCampus",
+        "parameters": [
+          {
+            "description": "Campus ID",
+            "example": "ff19a3a7-12f5-4332-9582-624519c3eaea",
+            "in": "path",
+            "name": "campusId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClustersV1DTO"
+                }
+              }
+            },
+            "description": "List of clusters in a campus"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of clusters in a campus by ID",
+        "tags": [
+          "Campus"
+        ]
+      }
+    },
+    "/v1/campuses/{campusId}/coalitions": {
+      "get": {
+        "operationId": "getCoalitionsByCampus",
+        "parameters": [
+          {
+            "description": "Campus ID",
+            "example": "ff19a3a7-12f5-4332-9582-624519c3eaea",
+            "in": "path",
+            "name": "campusId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoalitionsV1DTO"
+                }
+              }
+            },
+            "description": "List of coalitions in a campus"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of coalitions in a campus by ID",
+        "tags": [
+          "Campus"
+        ]
+      }
+    },
+    "/v1/campuses/{campusId}/participants": {
+      "get": {
+        "operationId": "getParticipantsByCampusId",
+        "parameters": [
+          {
+            "description": "Campus ID",
+            "example": "ff19a3a7-12f5-4332-9582-624519c3eaea",
+            "in": "path",
+            "name": "campusId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantLoginsV1DTO"
+                }
+              }
+            },
+            "description": "List of participants in a campus"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of participants in a campus by ID",
+        "tags": [
+          "Campus"
+        ]
+      }
+    },
+    "/v1/clusters/{clusterId}/map": {
+      "get": {
+        "operationId": "getParticipantsByCoalitionId_1",
+        "parameters": [
+          {
+            "description": "Cluster ID",
+            "example": 825,
+            "in": "path",
+            "name": "clusterId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "If true, occupied seats are returned. If false - only free seats are returned. If not specified - all seats are listed",
+            "in": "query",
+            "name": "occupied",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterMapV1DTO"
+                }
+              }
+            },
+            "description": "Cluster map"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a cluster map",
+        "tags": [
+          "Cluster"
+        ]
+      }
+    },
+    "/v1/coalitions/{coalitionId}/participants": {
+      "get": {
+        "operationId": "getParticipantsByCoalitionId",
+        "parameters": [
+          {
+            "description": "Coalition ID",
+            "example": 319,
+            "in": "path",
+            "name": "coalitionId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int32",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int32",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantLoginsV1DTO"
+                }
+              }
+            },
+            "description": "List of participants in a coalition"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of participants in a coalition by ID",
+        "tags": [
+          "Coalition"
+        ]
+      }
+    },
+    "/v1/courses/{courseId}": {
+      "get": {
+        "operationId": "getCourseByCourseId",
+        "parameters": [
+          {
+            "description": "Course ID",
+            "example": 123131,
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseV1DTO"
+                }
+              }
+            },
+            "description": "Course information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns course information by ID",
+        "tags": [
+          "Course"
+        ]
+      }
+    },
+    "/v1/events": {
+      "get": {
+        "operationId": "getEvents",
+        "parameters": [
+          {
+            "description": "Date and time of start of the sample, inclusive (in UTC)",
+            "example": "2024-01-23T00:00:00Z",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Date and time of end of the sample, inclusive (in UTC)",
+            "example": "2024-01-24T00:00:00Z",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Event type",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ACTIVITY",
+                "EXAM",
+                "TEST"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventsV1DTO"
+                }
+              }
+            },
+            "description": "List of events"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of events",
+        "tags": [
+          "Event"
+        ]
+      }
+    },
+    "/v1/graph": {
+      "get": {
+        "operationId": "getGraph",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphV1DTO"
+                }
+              }
+            },
+            "description": "Participant projects map"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a participant projects map",
+        "tags": [
+          "Graph"
+        ]
+      }
+    },
+    "/v1/participants/{login}": {
+      "get": {
+        "operationId": "getParticipantByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantV1DTO"
+                }
+              }
+            },
+            "description": "Basic participant information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns basic participant information by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/badges": {
+      "get": {
+        "operationId": "getBadgesByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantBadgesV1DTO"
+                }
+              }
+            },
+            "description": "List of participant badges"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of participant badges by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/coalition": {
+      "get": {
+        "operationId": "getCoalitionByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantCoalitionV1DTO"
+                }
+              }
+            },
+            "description": "Participant coalition information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant coalition information by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/courses": {
+      "get": {
+        "operationId": "getParticipantCoursesByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Course status",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ASSIGNED",
+                "REGISTERED",
+                "IN_PROGRESS",
+                "ACCEPTED",
+                "FAILED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantCoursesV1DTO"
+                }
+              }
+            },
+            "description": "Participant courses information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant courses information by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/courses/{courseId}": {
+      "get": {
+        "operationId": "getParticipantCourseByLoginAndCourseId",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Course ID",
+            "example": 12311,
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantCourseV1DTO"
+                }
+              }
+            },
+            "description": "Participant course information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant course information by ID",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/experience-history": {
+      "get": {
+        "operationId": "getXpHistoryByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantXpHistoryV1DTO"
+                }
+              }
+            },
+            "description": "List of participant XP accruals"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of participant XP accruals by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/feedback": {
+      "get": {
+        "operationId": "getParticipantFeedbackByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantFeedbackV1DTO"
+                }
+              }
+            },
+            "description": "Average participant feedback points"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns average participant feedback points by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/logtime": {
+      "get": {
+        "operationId": "getLogWeeklyAvgHoursByLoginAndDate",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Date. The average logtime will be calculated for the week that includes the specified date. If not specified, the current date is used by default",
+            "example": "2024-01-29",
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "logtimeWeeklyAvgHours",
+                  "example": 3.25,
+                  "format": "double",
+                  "type": "number"
+                }
+              }
+            },
+            "description": "Average week logtime"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns an average week logtime by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/points": {
+      "get": {
+        "operationId": "getPointsByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantPointsV1DTO"
+                }
+              }
+            },
+            "description": "Participant points"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant points information by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/projects": {
+      "get": {
+        "operationId": "getParticipantProjectsByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Project status",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ASSIGNED",
+                "REGISTERED",
+                "IN_PROGRESS",
+                "IN_REVIEWS",
+                "ACCEPTED",
+                "FAILED"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantProjectsV1DTO"
+                }
+              }
+            },
+            "description": "Participant projects information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant projects information by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/projects/{projectId}": {
+      "get": {
+        "operationId": "getParticipantProjectByLoginAndProjectId",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Project ID",
+            "example": 12311,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantProjectV1DTO"
+                }
+              }
+            },
+            "description": "Participant projects information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant project information by ID",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/skills": {
+      "get": {
+        "operationId": "getSoftSkillByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantSkillsV1DTO"
+                }
+              }
+            },
+            "description": "Participant skill points"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns participant skill points by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/participants/{login}/workstation": {
+      "get": {
+        "operationId": "getParticipantWorkstationByLogin",
+        "parameters": [
+          {
+            "description": "Login",
+            "example": "bibikov-lukyan",
+            "in": "path",
+            "name": "login",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantWorkstationV1DTO"
+                }
+              }
+            },
+            "description": "Participant workstation"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a participant workstation by login",
+        "tags": [
+          "Participant"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}": {
+      "get": {
+        "operationId": "getProjectByProjectId",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "example": 123131,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectV1DTO"
+                }
+              }
+            },
+            "description": "Project information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns project information by ID",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/participants": {
+      "get": {
+        "operationId": "getLoginsByProjectId",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "example": 123131,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Maximum number of records to be returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "format": "int64",
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Number of records to skip for pagination",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "format": "int64",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Project status",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ASSIGNED",
+                "REGISTERED",
+                "IN_PROGRESS",
+                "IN_REVIEWS",
+                "ACCEPTED",
+                "FAILED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Campus ID",
+            "example": "96098f4b-5708-4c42-a62c-6893419169b3",
+            "in": "query",
+            "name": "campusId",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantLoginsV1DTO"
+                }
+              }
+            },
+            "description": "List of participants"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NOT_FOUND",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Not found campus by id=ff19a3a7-12f5-4332-9582-624519c3eaea",
+                  "status": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns a list of participants by project ID",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/v1/sales": {
+      "get": {
+        "operationId": "getSales",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesV1DTO"
+                }
+              }
+            },
+            "description": "Sales information"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Limit must be positive number",
+                  "status": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "FORBIDDEN",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Forbidden",
+                  "status": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "INTERNAL_SERVER_ERROR",
+                  "exceptionUUID": "izP1aFojnJ",
+                  "message": "Internal Server Error",
+                  "status": 500
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDTO"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Returns current sales’ statuses within parallel",
+        "tags": [
+          "Sale"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "Authorization": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://platform.21-school.ru/services/21-school/api"
+    }
+  ],
+  "tags": [
+    {
+      "description": "Operations related to campuses",
+      "name": "Campus"
+    },
+    {
+      "description": "Operations related to clusters",
+      "name": "Cluster"
+    },
+    {
+      "description": "Operations related to events",
+      "name": "Event"
+    },
+    {
+      "description": "Operations related to sale",
+      "name": "Sale"
+    },
+    {
+      "description": "Operations related to projects",
+      "name": "Project"
+    },
+    {
+      "description": "Operations related to coalitions",
+      "name": "Coalition"
+    },
+    {
+      "description": "Operations related to participants",
+      "name": "Participant"
+    },
+    {
+      "description": "Operations related to courses",
+      "name": "Course"
+    },
+    {
+      "description": "Operations related to the graph",
+      "name": "Graph"
+    }
+  ]
+}

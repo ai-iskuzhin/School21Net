@@ -35,4 +35,16 @@ public sealed class CampusesResource
             query: null,
             cancellationToken);
     }
+
+    /// <summary>Clusters in a campus (<c>GET /v1/campuses/{campusId}/clusters</c>).</summary>
+    public async Task<IReadOnlyList<Cluster>> GetClustersAsync(
+        string campusId,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(campusId, nameof(campusId));
+        var envelope = await _client.GetAsync<ClustersEnvelope>(
+            $"/v1/campuses/{School21WireParsing.EscapeSegment(campusId)}/clusters", cancellationToken)
+            .ConfigureAwait(false);
+        return envelope.Clusters ?? [];
+    }
 }

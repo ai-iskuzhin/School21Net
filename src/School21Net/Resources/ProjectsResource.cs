@@ -35,4 +35,8 @@ public sealed class ProjectsResource
             query.Count > 0 ? query : null,
             cancellationToken);
     }
+
+    /// <summary>One project in the curriculum (<c>GET /v1/projects/{projectId}</c>).</summary>
+    public Task<Project> GetAsync(long projectId, CancellationToken cancellationToken = default)
+        => _client.GetAsync<Project>($"/v1/projects/{projectId}", cancellationToken);
 }

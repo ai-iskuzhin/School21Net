@@ -62,4 +62,111 @@ public sealed class ParticipantsResource
         return _client.GetAsync<ParticipantFeedback>(
             $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/feedback", cancellationToken);
     }
+
+    /// <summary>Badges a participant has earned (<c>GET /v1/participants/{login}/badges</c>).</summary>
+    public async Task<IReadOnlyList<ParticipantBadge>> GetBadgesAsync(
+        string login,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        var envelope = await _client.GetAsync<ParticipantBadgesEnvelope>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/badges", cancellationToken)
+            .ConfigureAwait(false);
+        return envelope.Badges ?? [];
+    }
+
+    /// <summary>A participant's skills and their points (<c>GET /v1/participants/{login}/skills</c>).</summary>
+    public async Task<IReadOnlyList<ParticipantSkill>> GetSkillsAsync(
+        string login,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        var envelope = await _client.GetAsync<ParticipantSkillsEnvelope>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/skills", cancellationToken)
+            .ConfigureAwait(false);
+        return envelope.Skills ?? [];
+    }
+
+    /// <summary>Where a participant is sitting (<c>GET /v1/participants/{login}/workstation</c>).</summary>
+    public Task<ParticipantWorkstation> GetWorkstationAsync(
+        string login,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        return _client.GetAsync<ParticipantWorkstation>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/workstation", cancellationToken);
+    }
+
+    /// <summary>
+    /// Average hours a participant spends on campus per week
+    /// (<c>GET /v1/participants/{login}/logtime</c>).
+    /// <para>
+    /// A bare number rather than an object, which is why this returns <see cref="double"/> and not a
+    /// model — wrapping one figure in a record would invent a shape the API does not have.
+    /// </para>
+    /// </summary>
+    /// <param name="login">Participant login.</param>
+    /// <param name="date">Which month to report on, or null for the current one.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public Task<double> GetLogtimeAsync(
+        string login,
+        DateOnly? date = null,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        var path = $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/logtime";
+
+        if (date is { } wanted)
+        {
+            path += School21Client.BuildQueryString(
+                [new KeyValuePair<string, string>("date", wanted.ToString("yyyy-MM-dd"))]);
+        }
+
+        return _client.GetAsync<double>(path, cancellationToken);
+    }
+
+    /// <summary>XP accruals over time (<c>GET /v1/participants/{login}/experience-history</c>), paged.</summary>
+    public Task<IReadOnlyList<ParticipantXpEntry>> GetExperienceHistoryAsync(
+        string login,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        return _client.GetPagedAsync<ParticipantXpHistoryEnvelope, ParticipantXpEntry>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/experience-history",
+            envelope => envelope.ExpHistory,
+            query: null,
+            cancellationToken);
+    }
+
+    /// <summary>Courses on a participant's roadmap (<c>GET /v1/participants/{login}/courses</c>), paged.</summary>
+    /// <param name="login">Participant login.</param>
+    /// <param name="status">Narrow to one status, or null for all.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public Task<IReadOnlyList<ParticipantCourse>> GetCoursesAsync(
+        string login,
+        ParticipantCourseStatus? status = null,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        var query = status is { } wanted
+            ? new List<KeyValuePair<string, string>> {new("status", ScreamingSnakeEnumConverter<ParticipantCourseStatus>.ToWire(wanted))}
+            : null;
+
+        return _client.GetPagedAsync<ParticipantCoursesEnvelope, ParticipantCourse>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/courses",
+            envelope => envelope.Courses,
+            query,
+            cancellationToken);
+    }
+
+    /// <summary>One course on a participant's roadmap (<c>GET /v1/participants/{login}/courses/{courseId}</c>).</summary>
+    public Task<ParticipantCourse> GetCourseAsync(
+        string login,
+        long courseId,
+        CancellationToken cancellationToken = default)
+    {
+        School21WireParsing.RequireNonEmpty(login, nameof(login));
+        return _client.GetAsync<ParticipantCourse>(
+            $"/v1/participants/{School21WireParsing.EscapeSegment(login)}/courses/{courseId}", cancellationToken);
+    }
 }
